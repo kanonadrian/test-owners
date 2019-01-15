@@ -19,7 +19,7 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="col"><h2>Regitro</h2></div>
+                <div class="col"><h2>Registro</h2></div>
                 <div class="col"></div>
                 <div class="col"><h2>Iniciar sesión</h2></div>
             </div>
@@ -94,12 +94,13 @@
                         var accessToken = result.getAccessToken().getJwtToken();
                         /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer*/
                         var idToken = result.idToken.jwtToken;
-
+                        alert('Inicio sesión con éxito!');
                         console.log(accessToken);
                         console.log(idToken);
                     },
 
                     onFailure: function(err) {
+                        console.log('Error al iniciar sesión');
                         console.log(err);
                     },
 
@@ -149,6 +150,7 @@
                 if (name == '' || family_name == '' || email == '' || phone_number == '') {
 
                     console.log('Favor ingrese todos los datos requeridos(*).');
+                    alert('Favor ingrese todos los datos requeridos(*).');
                     return false;
 
                 }
@@ -160,7 +162,7 @@
                         return;
                     }else{
                         console.log(result.user);
-                        alert('user created');
+                        alert('Usuario creado con éxito!');
                     }
                     
                 });
