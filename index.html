@@ -42,6 +42,7 @@
                 cognitoUser.getSession(function(err, session) {
                     if (err) {
                         console.log(err);
+                        window.location='login.html';
                         return;
                     }
                     var dataUser = session.idToken.payload;
