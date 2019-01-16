@@ -15,54 +15,16 @@
     </head>
     <body>
         <div class="row" style="background-color: #232f3e; margin-bottom: 20px;">
-            <div class="col"><h1 class="text-center" style="padding: 20px; color: #dd6b10;">AWS Cognito</h1></div>
+            <div class="col-10"><h1 class="text-center" style="padding: 20px; color: #dd6b10;">DATOS DEL USUARIO</h1></div>
+            <div class="col-2" style="padding: 30px; cursor: pointer;"><span class="text-primary" id="logout">Cerrar sesión</span></div>
         </div>
         <div class="container">
             <div class="row">
-                <div class="col"><h2>Registro</h2></div>
-                <div class="col"></div>
-                <div class="col"><h2>Iniciar sesión</h2></div>
-            </div>
-            <div class="row">
                 <div class="col">
-                    <form>
-                        <div class="form-group">
-                            <label for="inputName">* Nombre: </label>
-                            <input type="text" class="form-control" id="inputName" aria-describedby="nombreHelp" placeholder="Ingrese su nombre">
-                            <!-- <small id="nombreHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
-                        </div>
-                        <div class="form-group">
-                            <label for="inputFamilyName">Apellido: </label>
-                            <input type="text" class="form-control" id="inputFamilyName"placeholder="Ingrese su apellido">
-                        </div>
-                        <div class="form-group">
-                            <label for="inputEmail">* Usuario: </label>
-                            <input type="email" class="form-control" id="inputEmail" placeholder="Ingresa tu correo">
-                        </div>
-                        <div class="form-group">
-                            <label for="inputPhoneNumber">Teléfono: </label>
-                            <input type="tel" class="form-control" id="inputPhoneNumber" placeholder="Ingresa teléfono">
-                        </div>
-                        <div class="form-group">
-                            <label for="inputPassword">* Contraseña: </label>
-                            <input type="password" class="form-control" id="inputPassword" placeholder="Ingresa contraseña">
-                        </div>
-                        <button type="button" class="btn btn-primary" id="registerUser">Registrar</button>
-                    </form>
-                </div>
-                <div class="col"></div>
-                <div class="col">
-                    <form>
-                        <div class="form-group">
-                            <label for="inputEmail2">* Usuario: </label>
-                            <input type="email" class="form-control" id="inputEmail2" placeholder="Ingresa tu correo">
-                        </div>
-                        <div class="form-group">
-                            <label for="inputPassword2">* Contraseña: </label>
-                            <input type="password" class="form-control" id="inputPassword2" placeholder="Ingresa contraseña">
-                        </div>
-                        <button type="button" class="btn btn-primary" id="loginUser">Ingresar</button>
-                    </form>
+                    <p >Usuario: <span id="user" class="text-success"></span></p>
+                    <p>Access Token: <span id="accessToken" class="text-success" ></span></p>
+                    <p>Id Token: <span id="idToken" class="text-success"></span></p>
+                    <p>Refresh Token: <span id="refreshToken" class="text-success"></span></p>
                 </div>
             </div>
         </div>
@@ -73,99 +35,34 @@
                 ClientId : '4549e7m8jjht6gc8je6ma77ed6' // client id 
             };
 
-            $('#loginUser').on('click', function(){
+            var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            var cognitoUser = userPool.getCurrentUser();
 
-                var email = $('#inputEmail2').val();
-                var password = $('#inputPassword2').val();
-                var authenticationData = {
-                    Username : email,
-                    Password : password,
-                };
-                var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
-                var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-                var userData = {
-                    Username : email,
-                    Pool : userPool
-                };
-                var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-
-                cognitoUser.authenticateUser(authenticationDetails, {
-                    onSuccess: function (result) {
-                        var accessToken = result.getAccessToken().getJwtToken();
-                        /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer*/
-                        var idToken = result.idToken.jwtToken;
-                        alert('Inicio sesión con éxito!');
-                        console.log(accessToken);
-                        console.log(idToken);
-                    },
-
-                    onFailure: function(err) {
-                        alert('Error al iniciar sesión');
+            if (cognitoUser != null) {
+                cognitoUser.getSession(function(err, session) {
+                    if (err) {
                         console.log(err);
-                    },
-
-                });
-
-            });
-
-            $('#registerUser').on('click', function(){
-
-                var name = $('#inputName').val();
-                var family_name = $('#inputFamilyName').val();
-                var email = $('#inputEmail').val();
-                var phone_number = $('#inputPhoneNumber').val();
-                var password = $('#inputPassword').val();
-
-                var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-
-                var attributeList = [];
-
-                var dataName = {
-                    Name : 'name',
-                    Value : name
-                };
-                var dataFamilyName = {
-                    Name : 'family_name',
-                    Value : family_name
-                };
-                var dataEmail = {
-                    Name : 'email',
-                    Value : email
-                };
-                var dataPhoneNumber = {
-                    Name : 'phone_number',
-                    Value : phone_number
-                };
-                var attributeName = new AmazonCognitoIdentity.CognitoUserAttribute(dataName);
-                var attributeFamilyName = new AmazonCognitoIdentity.CognitoUserAttribute(dataFamilyName);
-                var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
-                var attributePhoneNumber = new AmazonCognitoIdentity.CognitoUserAttribute(dataPhoneNumber);
-
-                attributeList.push(attributeName);
-                attributeList.push(attributeFamilyName);
-                attributeList.push(attributeEmail);
-                attributeList.push(attributePhoneNumber);
-
-
-                if (name == '' || family_name == '' || email == '' || phone_number == '') {
-
-                    console.log('Favor ingrese todos los datos requeridos(*).');
-                    alert('Favor ingrese todos los datos requeridos(*).');
-                    return false;
-
-                }
-
-                userPool.signUp(email, password, attributeList, null, function(error, result){
-                    if (error) {
-                        console.log(error);
-                        alert(error.message);
                         return;
-                    }else{
-                        console.log(result.user);
-                        alert('Usuario creado con éxito!');
                     }
-                    
+                    var dataUser = session.idToken.payload;
+
+                    $('#user').html(dataUser.email);
+                    $('#accessToken').html(session.accessToken.jwtToken);
+                    $('#idToken').html(session.idToken.jwtToken);
+                    $('#refreshToken').html(session.refreshToken.token);
+                    console.log('session validity: ' + session.isValid());
+
                 });
+            }else{
+                window.location='login.html';
+            }
+
+
+
+            $('#logout').on('click', function(){
+                console.log('1');
+                cognitoUser.signOut();
+                location.reload();
 
             });
         </script>
