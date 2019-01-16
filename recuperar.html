@@ -60,7 +60,8 @@
 
                 cognitoUser.forgotPassword({
                     onSuccess: function (result) {
-                        console.log('call result: ' + result);
+                        alert('Favor inicie sesión');
+                        window.location='login.html';
                     },
                     onFailure: function(err) {
                         console.log(err);
